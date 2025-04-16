@@ -70,7 +70,6 @@
 extern crate alloc;
 
 use core::marker::PhantomData;
-use core::mem; // Import mem for swap
 
 use embedded_graphics::{
     pixelcolor::{raw::RawU4, PixelColor},
@@ -303,16 +302,28 @@ where
 
     /// Updates the display with the content of the internal buffer.
     pub fn flush(&mut self) -> Result<(), Error<SpiE, PinE>> {
-        let mut buffer_temp = [0x11; BUFFER_SIZE]; // Default value (white)
-        mem::swap(&mut self.buffer, &mut buffer_temp);
-
         self.write_command(CMD_DATA_START_TRANSMISSION)?;
-        let result_data = self.write_data(&buffer_temp);
 
-        mem::swap(&mut self.buffer, &mut buffer_temp);
+        // Send the buffer contents in chunks to avoid borrow conflicts
+        // and large stack allocations.
+        pin_try!(self.dc.set_high()); // Set DC high for data once
+        pin_try!(self.cs.set_low());  // Assert CS once
 
-        result_data?; // Propagate error if write_data failed
+        let chunk_size = 4096; // Send in 4KB chunks (adjust as needed)
+        let mut result: Result<(), Error<SpiE, PinE>> = Ok(());
+        for chunk in self.buffer.chunks(chunk_size) {
+            // Use the underlying SpiDevice::write directly within the loop
+            result = self.spi.write(chunk).map_err(Error::Spi);
+            if result.is_err() {
+                break; // Exit loop on SPI error
+            }
+        }
 
+        pin_try!(self.cs.set_high()); // De-assert CS after all chunks
+
+        result?; // Propagate any SPI error from the loop
+
+        // Refresh the display
         self.refresh()
     }
 
