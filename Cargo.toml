@@ -1,0 +1,16 @@
+[package]
+name = "gdep073e01"
+version = "0.1.0"
+edition = "2021"
+authors = ["Andrei Kandratovich <xandron.ak@gmail.com>"]
+license = "MIT"
+description = "An embedded-graphics driver for the Good Display GDEP073E01 7-color e-paper display (800x480), based on the GxEPD2 C++ library."
+repository = "https://github.com/xandronak/gdep073e01"
+homepage = "https://github.com/xandronak/gdep073e01"
+readme = "README.md"
+keywords = ["embedded", "embedded-hal", "epaper", "eink", "display", "graphics", "no-std"]
+categories = ["embedded", "hardware-support", "no-std", "graphics"]
+
+[dependencies]
+embedded-graphics = "0.8"
+embedded-hal = "1.0"
