@@ -70,6 +70,8 @@
 extern crate alloc;
 
 use core::marker::PhantomData;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use embedded_graphics::{
     pixelcolor::{raw::RawU4, PixelColor},
@@ -152,7 +154,7 @@ pub struct Gdep073e01<SPI, CS, DC, RST, BUSY, DELAY> {
     /// Delay provider.
     delay: DELAY,
     /// Internal frame buffer (1 byte per 2 pixels).
-    buffer: [u8; BUFFER_SIZE],
+    buffer: Box<[u8]>,
     /// Marker for DrawTarget compatibility
     _phantom: PhantomData<Color>,
 }
@@ -183,6 +185,9 @@ where
         busy: BUSY,
         delay: DELAY,
     ) -> Self {
+        // Create buffer on the heap instead of stack
+        let buffer = vec![0x11; BUFFER_SIZE].into_boxed_slice();
+        
         Self {
             spi,
             cs,
@@ -190,7 +195,7 @@ where
             rst,
             busy,
             delay,
-            buffer: [0x11; BUFFER_SIZE], // Initialize with white
+            buffer,
             _phantom: PhantomData,
         }
     }
@@ -201,7 +206,6 @@ where
     /// This method should be called before any drawing operations.
     pub fn init(&mut self) -> Result<(), Error<SpiE, PinE>> {
         self.reset()?;
-        Self::wait_until_idle(&mut self.busy, &mut self.delay)?;
 
         // Initialization sequence based on C++ examples (EPD_init / GxEPD2)
         self.command_with_data(CMD_CMDH, &[0x49, 0x55, 0x20, 0x08, 0x09, 0x18])?;
@@ -225,8 +229,6 @@ where
 
     /// Resets the display hardware.
     fn reset(&mut self) -> Result<(), Error<SpiE, PinE>> {
-        pin_try!(self.rst.set_high());
-        self.delay.delay_ms(RESET_DELAY_MS);
         pin_try!(self.rst.set_low());
         self.delay.delay_ms(RESET_DELAY_MS);
         pin_try!(self.rst.set_high());
@@ -266,6 +268,7 @@ where
         DELAY: DelayNs,
     {
         let mut remaining_delay = BUSY_TIMEOUT_MS;
+        
         while busy.is_high().map_err(Error::Pin)? {
             if remaining_delay == 0 {
                 return Err(Error::Timeout);
@@ -274,6 +277,7 @@ where
             delay.delay_ms(delay_step);
             remaining_delay -= delay_step;
         }
+        
         Ok(())
     }
 
@@ -642,10 +646,10 @@ mod tests {
         let mut busy = MockInputPin{ name: "busy", ..Default::default() };
         let mut delay = MockDelay::default();
 
-        // Simulate busy pin going low after reset and commands
+        // Simulate busy pin going low after power_on only
+        // (we don't wait for idle after reset anymore)
         busy.states = vec![
             PinState::Low, // After power on
-            PinState::Low, // After reset
         ];
 
         let mut display = Gdep073e01::new(spi, cs, dc, rst, busy, delay);
@@ -711,7 +715,7 @@ mod tests {
         // Check Data Transmission Start command
         assert!(spi_writes.iter().any(|w| w.len() == 1 && w[0] == CMD_DATA_START_TRANSMISSION));
         
-        // Check that the buffer content was sent (assuming write() is used, check last large write)
+        // Check that the buffer content was sent
         assert!(spi_writes.iter().any(|w| w.len() == BUFFER_SIZE && w[0] == 0xAB));
 
         // Check Display Refresh command

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-04-16
+
+### Changed
+
+*   Significantly improved memory usage by moving the internal buffer from stack to heap.
+*   Changed buffer storage type from `[u8; BUFFER_SIZE]` to `Box<[u8]>`, preventing stack overflow during driver instantiation.
+*   This fix addresses situations where even `Box::new(Gdep073e01::new(...))` would fail, as the temporary Gdep073e01 instance would be created on the stack before being moved to the heap.
+*   Improved initialization sequence by removing BUSY pin checking after reset, which could cause hanging with some display modules.
+
 ## [0.1.1] - 2025-04-16
 
 ### Fixed
@@ -25,5 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 *   Mock-based unit tests for core functionality (`init`, buffer manipulation).
 *   Crate documentation and README.
 
+[0.2.0]: https://github.com/xandronak/gdep073e01/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/xandronak/gdep073e01/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/xandronak/gdep073e01/releases/tag/v0.1.0 
