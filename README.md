@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/gdep073e01.svg)](https://crates.io/crates/gdep073e01)
 [![Documentation](https://docs.rs/gdep073e01/badge.svg)](https://docs.rs/gdep073e01)
-[![Build Status](https://github.com/yourusername/gdep073e01/workflows/CI/badge.svg)](https://github.com/xandronak/gdep073e01/actions)
+[![Build Status](https://github.com/xandronak/gdep073e01/workflows/CI/badge.svg)](https://github.com/xandronak/gdep073e01/actions)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](https://github.com/xandronak/gdep073e01)
 
 A robust, `no_std` embedded Rust driver for the **Good Display GDEP073E01** 7.5-inch, 7-color e-paper display. This driver provides full integration with the [`embedded-graphics`](https://github.com/embedded-graphics/embedded-graphics) ecosystem, enabling rich graphical applications on resource-constrained embedded systems.
