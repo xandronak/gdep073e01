@@ -1,3 +1,2 @@
-var srcIndex = new Map(JSON.parse('[["gdep073e01",["",[],["lib.rs"]]]]'));
-createSrcSidebar();
-//{"start":36,"fragment_lengths":[33]}
+createSrcSidebar('[["gdep073e01",["",[],["lib.rs"]]]]');
+//{"start":19,"fragment_lengths":[33]}
