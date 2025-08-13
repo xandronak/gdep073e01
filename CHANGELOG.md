@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/xandronak/gdep073e01/compare/v0.2.0...v0.3.0) (2025-08-13)
+
+
+### Features
+
+* upgrade to embedded-hal 1.0 with improved error handling ([f9856a1](https://github.com/xandronak/gdep073e01/commit/f9856a1c1f1ae90a0b67dd01df26580b24d6338c))
+
+
+### Bug Fixes
+
+* **README:** update badge URLs to correct username ([fc6f97a](https://github.com/xandronak/gdep073e01/commit/fc6f97ab2d3b2fac992c7fff5372452332a08e9c))
+
 ## [0.3.0] - 2025-08-04
 
 ### Fixed

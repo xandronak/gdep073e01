@@ -1,6 +1,6 @@
 [package]
 name = "gdep073e01"
-version = "0.3.1"
+version = "0.3.0"
 edition = "2021"
 authors = ["Andrei Kandratovich <xandron.ak@gmail.com>"]
 license = "MIT OR Apache-2.0"
