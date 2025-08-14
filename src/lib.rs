@@ -49,17 +49,26 @@
 extern crate alloc;
 
 // Feature exclusivity checks for dithering strategies
-#[cfg(all(feature = "pal-spectra6", all(feature = "dither-bayer", any(feature = "dither-fs", feature = "halftone"))))]
+#[cfg(all(
+    feature = "pal-spectra6",
+    all(
+        feature = "dither-bayer",
+        any(feature = "dither-fs", feature = "halftone")
+    )
+))]
 compile_error!("Choose exactly one dither feature: dither-bayer OR dither-fs OR halftone.");
-#[cfg(all(feature = "pal-spectra6", all(feature = "dither-fs", feature = "halftone")))]
+#[cfg(all(
+    feature = "pal-spectra6",
+    all(feature = "dither-fs", feature = "halftone")
+))]
 compile_error!("Choose exactly one dither feature.");
 
-#[cfg(feature = "pal-spectra6")]
-pub mod palette;
-#[cfg(any(feature = "dither-bayer", feature = "dither-fs", feature = "halftone"))]
-pub mod dither;
 #[cfg(any(feature = "dither-bayer", feature = "dither-fs", feature = "halftone"))]
 pub mod adapter;
+#[cfg(any(feature = "dither-bayer", feature = "dither-fs", feature = "halftone"))]
+pub mod dither;
+#[cfg(feature = "pal-spectra6")]
+pub mod palette;
 
 use alloc::{boxed::Box, vec};
 use core::marker::PhantomData;

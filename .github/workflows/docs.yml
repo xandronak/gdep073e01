@@ -18,7 +18,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build docs
-        run: cargo doc --no-deps --all-features
+        run: cargo doc --no-deps --no-default-features --features "pal-spectra6,dither-bayer"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

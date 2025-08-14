@@ -19,14 +19,9 @@ impl DitherStrategy for Bayer4x4 {
     fn map(&mut self, x: u32, y: u32, rgb: [u8; 3]) -> Spectra6 {
         // 4x4 Bayer thresholds 0..15
         // Source: standard Bayer matrix
-        const M: [[i16; 4]; 4] = [
-            [0, 8, 2, 10],
-            [12, 4, 14, 6],
-            [3, 11, 1, 9],
-            [15, 7, 13, 5],
-        ];
+        const M: [[i16; 4]; 4] = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
         let t = M[(y as usize) & 3][(x as usize) & 3] as i16; // 0..15
-        // Convert t to a small bias in -8..+7
+                                                              // Convert t to a small bias in -8..+7
         let bias = t - 8;
         // Apply slight luminance-ish bias equally to channels
         let b = [bias, bias, bias];
@@ -62,7 +57,9 @@ impl FloydSteinberg {
     pub fn start_line(&mut self, y: u32) {
         if y != self.y {
             core::mem::swap(&mut self.cur, &mut self.nxt);
-            for v in &mut self.nxt { *v = 0; }
+            for v in &mut self.nxt {
+                *v = 0;
+            }
             self.y = y;
             self.x = 0;
         }
@@ -73,7 +70,9 @@ impl FloydSteinberg {
 impl DitherStrategy for FloydSteinberg {
     fn map(&mut self, x: u32, y: u32, rgb: [u8; 3]) -> Spectra6 {
         // Assume left-to-right scanline order. If new line, roll buffers.
-        if y != self.y || (x == 0 && self.x != 0) { self.start_line(y); }
+        if y != self.y || (x == 0 && self.x != 0) {
+            self.start_line(y);
+        }
         self.x = x;
         let idx = (x as usize) * 3;
         let adj = [
@@ -84,18 +83,17 @@ impl DitherStrategy for FloydSteinberg {
         let q = map_rgb_to_spectra6_nearest(adj);
         // Quantization error e = adj - q_color
         let qc = match q {
-            Spectra6::White => [255,255,255],
-            Spectra6::Black => [0,0,0],
-            Spectra6::Yellow => [255,255,0],
-            Spectra6::Red => [255,0,0],
-            Spectra6::Green => [0,255,0],
-            Spectra6::Blue => [0,0,255],
+            Spectra6::White => [255, 255, 255],
+            Spectra6::Black => [0, 0, 0],
+            Spectra6::Yellow => [255, 255, 0],
+            Spectra6::Red => [255, 0, 0],
+            Spectra6::Green => [0, 255, 0],
+            Spectra6::Blue => [0, 0, 255],
         };
         let er = adj[0] as i16 - qc[0] as i16;
         let eg = adj[1] as i16 - qc[1] as i16;
         let eb = adj[2] as i16 - qc[2] as i16;
         // Distribute error: right (7/16), down-left (3/16), down (5/16), down-right (1/16)
-        let w = self.width as usize;
         // Right neighbor
         if x + 1 < self.width {
             let j = idx + 3;
@@ -139,13 +137,27 @@ pub struct Halftone {
 
 #[cfg(feature = "halftone")]
 impl Halftone {
-    pub fn new(tile: u8) -> Self { Self { tile: if tile < 2 { 2 } else { tile.min(3) } } }
+    pub fn new(tile: u8) -> Self {
+        Self {
+            tile: if tile < 2 { 2 } else { tile.min(3) },
+        }
+    }
     #[inline]
-    fn level_from_rgb(rgb: [u8;3]) -> u8 {
+    fn level_from_rgb(rgb: [u8; 3]) -> u8 {
         // Simple luminance approximation 0..255
-        let y = (3*rgb[0] as u16 + 6*rgb[1] as u16 + 1*rgb[2] as u16) / 10;
+        let y = (3 * rgb[0] as u16 + 6 * rgb[1] as u16 + 1 * rgb[2] as u16) / 10;
         // Map to 0, 64,128,192,255 ~ 5 levels
-        if y < 32 { 0 } else if y < 96 { 1 } else if y < 160 { 2 } else if y < 224 { 3 } else { 4 }
+        if y < 32 {
+            0
+        } else if y < 96 {
+            1
+        } else if y < 160 {
+            2
+        } else if y < 224 {
+            3
+        } else {
+            4
+        }
     }
 }
 
@@ -160,20 +172,29 @@ impl DitherStrategy for Halftone {
         // 2x2 ordering for levels 0..4
         let on = if self.tile == 2 {
             // 2x2 pattern order: [ (0,0), (1,1), (1,0), (0,1) ]
-            let rank = match (xi, yi) { (0,0)=>0, (1,1)=>1, (1,0)=>2, _=>3 };
+            let rank = match (xi, yi) {
+                (0, 0) => 0,
+                (1, 1) => 1,
+                (1, 0) => 2,
+                _ => 3,
+            };
             lvl > rank
         } else {
             // 3x3 pattern order by Bayer-like ranks 0..8
             let rank = match (xi, yi) {
-                (1,1)=>0,
-                (2,0)|(0,2)=>1,
-                (0,1)|(1,0)|(1,2)|(2,1)=>2,
-                (0,0)|(2,2)=>3,
-                _=>4,
+                (1, 1) => 0,
+                (2, 0) | (0, 2) => 1,
+                (0, 1) | (1, 0) | (1, 2) | (2, 1) => 2,
+                (0, 0) | (2, 2) => 3,
+                _ => 4,
             };
             lvl > rank
         };
-        if on { Spectra6::White } else { Spectra6::Black }
+        if on {
+            Spectra6::White
+        } else {
+            Spectra6::Black
+        }
     }
 }
 
@@ -185,8 +206,8 @@ mod tests {
     #[test]
     fn bayer_deterministic() {
         let mut b = Bayer4x4;
-        let a = b.map(10, 10, [120,130,140]);
-        let a2 = b.map(10, 10, [120,130,140]);
+        let a = b.map(10, 10, [120, 130, 140]);
+        let a2 = b.map(10, 10, [120, 130, 140]);
         assert_eq!(a, a2);
     }
 
@@ -195,8 +216,8 @@ mod tests {
     fn halftone_levels() {
         let mut h = Halftone::new(2);
         // Dark should be black, light should be white at same coords
-        let c1 = h.map(0,0,[10,10,10]);
-        let c2 = h.map(0,0,[240,240,240]);
+        let c1 = h.map(0, 0, [10, 10, 10]);
+        let c2 = h.map(0, 0, [240, 240, 240]);
         assert!(matches!(c1, Spectra6::Black));
         assert!(matches!(c2, Spectra6::White));
     }

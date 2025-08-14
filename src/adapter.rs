@@ -1,13 +1,9 @@
 //! DitherDrawTarget adapter: converts Rgb888 to panel Color using a strategy.
 
-use embedded_graphics::{
-    pixelcolor::Rgb888,
-    prelude::*,
-    primitives::Rectangle,
-};
+use embedded_graphics::{pixelcolor::Rgb888, prelude::*, primitives::Rectangle};
 
 use crate::dither::DitherStrategy;
-use crate::palette::{map_rgb_to_spectra6_nearest, Spectra6};
+use crate::palette::map_rgb_to_spectra6_nearest;
 
 /// Wrap an embedded-graphics DrawTarget to apply palette+dither at draw time.
 pub struct DitherDrawTarget<T, S> {
@@ -16,10 +12,18 @@ pub struct DitherDrawTarget<T, S> {
 }
 
 impl<T, S> DitherDrawTarget<T, S> {
-    pub fn new(inner: T, strat: S) -> Self { Self { inner, strat } }
-    pub fn into_inner(self) -> T { self.inner }
-    pub fn inner_mut(&mut self) -> &mut T { &mut self.inner }
-    pub fn strategy_mut(&mut self) -> &mut S { &mut self.strat }
+    pub fn new(inner: T, strat: S) -> Self {
+        Self { inner, strat }
+    }
+    pub fn into_inner(self) -> T {
+        self.inner
+    }
+    pub fn inner_mut(&mut self) -> &mut T {
+        &mut self.inner
+    }
+    pub fn strategy_mut(&mut self) -> &mut S {
+        &mut self.strat
+    }
 }
 
 impl<T, S, E> DrawTarget for DitherDrawTarget<T, S>
@@ -60,7 +64,8 @@ where
                     .strat
                     .map(sx, sy, [color.r(), color.g(), color.b()])
                     .to_driver_color();
-                self.inner.draw_iter(core::iter::once(Pixel(Point::new(x, y), c6)))?;
+                self.inner
+                    .draw_iter(core::iter::once(Pixel(Point::new(x, y), c6)))?;
             }
         }
         Ok(())
@@ -76,5 +81,7 @@ impl<T, S> OriginDimensions for DitherDrawTarget<T, S>
 where
     T: OriginDimensions,
 {
-    fn size(&self) -> Size { self.inner.size() }
+    fn size(&self) -> Size {
+        self.inner.size()
+    }
 }

@@ -1,7 +1,6 @@
 //! Spectra6 palette and mapping utilities.
 //! Works in no_std.
 
-
 /// Fixed Spectra 6 palette order used by the panel’s LUT/driver (excluding Orange).
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Spectra6 {
@@ -77,12 +76,18 @@ pub fn map_rgb_to_spectra6_nearest(rgb: [u8; 3]) -> Spectra6 {
 /// Utility: clamp i32 to 0..=255 and return u8.
 #[inline]
 pub fn clamp_u8(v: i32) -> u8 {
-    if v < 0 { 0 } else if v > 255 { 255 } else { v as u8 }
+    if v < 0 {
+        0
+    } else if v > 255 {
+        255
+    } else {
+        v as u8
+    }
 }
 
 /// Utility: add bias to an rgb triple with saturation.
 #[inline]
-pub fn add_bias(rgb: [u8;3], bias: [i16;3]) -> [u8;3] {
+pub fn add_bias(rgb: [u8; 3], bias: [i16; 3]) -> [u8; 3] {
     [
         clamp_u8(rgb[0] as i32 + bias[0] as i32),
         clamp_u8(rgb[1] as i32 + bias[1] as i32),
@@ -96,12 +101,18 @@ mod tests {
 
     #[test]
     fn nearest_basic() {
-        assert_eq!(map_rgb_to_spectra6_nearest([250,250,250]), Spectra6::White);
-        assert_eq!(map_rgb_to_spectra6_nearest([5,5,5]), Spectra6::Black);
-        assert_eq!(map_rgb_to_spectra6_nearest([250,240,10]), Spectra6::Yellow);
-        assert_eq!(map_rgb_to_spectra6_nearest([250,10,10]), Spectra6::Red);
-        assert_eq!(map_rgb_to_spectra6_nearest([10,250,10]), Spectra6::Green);
-        assert_eq!(map_rgb_to_spectra6_nearest([10,10,250]), Spectra6::Blue);
+        assert_eq!(
+            map_rgb_to_spectra6_nearest([250, 250, 250]),
+            Spectra6::White
+        );
+        assert_eq!(map_rgb_to_spectra6_nearest([5, 5, 5]), Spectra6::Black);
+        assert_eq!(
+            map_rgb_to_spectra6_nearest([250, 240, 10]),
+            Spectra6::Yellow
+        );
+        assert_eq!(map_rgb_to_spectra6_nearest([250, 10, 10]), Spectra6::Red);
+        assert_eq!(map_rgb_to_spectra6_nearest([10, 250, 10]), Spectra6::Green);
+        assert_eq!(map_rgb_to_spectra6_nearest([10, 10, 250]), Spectra6::Blue);
     }
 
     #[test]
