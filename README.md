@@ -186,6 +186,43 @@ let blue_stroke = PrimitiveStyle::with_stroke(Color::Blue, 3);
 - **Idle (after refresh)**: ~1-2mA @ 3.3V
 - **Deep Sleep**: <1µA @ 3.3V
 
+## 🧪 Optional on-device dithering and halftone
+
+Enable exactly one dither feature at a time together with pal-spectra6:
+
+- dither-bayer: zero-alloc ordered 4×4 Bayer
+- dither-fs: Floyd–Steinberg (requires alloc)
+- halftone: simple 2×2/3×3 halftone
+
+Example usage with embedded-graphics Rgb888 drawing through a dither wrapper:
+
+```
+use embedded_graphics::{prelude::*, pixelcolor::Rgb888, primitives::*};
+use gdep073e01::{Gdep073e01, WIDTH, HEIGHT};
+#[cfg(feature = "dither-bayer")] use gdep073e01::dither::Bayer4x4;
+use gdep073e01::adapter::DitherDrawTarget;
+
+let mut display = Gdep073e01::new(spi, cs, dc, rst, busy, delay);
+display.init()?;
+#[cfg(feature = "dither-bayer")]
+let strat = Bayer4x4;
+#[cfg(feature = "dither-bayer")]
+let mut dt = DitherDrawTarget::new(display, strat);
+
+#[cfg(feature = "dither-bayer")]
+Rectangle::new(Point::new(0,0), Size::new(WIDTH, HEIGHT))
+    .into_styled(PrimitiveStyle::with_fill(Rgb888::new(200,220,255)))
+    .draw(&mut dt)?;
+```
+
+Build example feature set:
+
+```
+cargo build --no-default-features --features pal-spectra6,dither-bayer
+```
+
+Limitations: choose exactly one dither feature; FS expects left-to-right scanline order for best results.
+
 ## 📚 Examples
 
 ### Drawing Primitives

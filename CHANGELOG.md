@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-08-14
+
+### Added
+
+- Optional on-device RGB→Spectra6 palettization utilities behind feature flags (`pal-spectra6`).
+- Dithering strategies:
+  - `dither-bayer`: ordered 4×4 Bayer, zero-alloc, fast.
+  - `dither-fs`: Floyd–Steinberg error diffusion (uses small line buffers; requires alloc).
+  - `halftone`: simple 2×2/3×3 tile-based halftone.
+- `DitherDrawTarget` adapter to draw `embedded-graphics::Rgb888` primitives through a strategy, converting to panel colors on the fly.
+- Tests to ensure Spectra6 maps to correct native nibble codes and strategy determinism.
+- README section documenting how to enable and use the dithering features.
+
+### Notes
+
+- Only one dither feature can be enabled at a time (compile-time exclusivity enforced).
+- Spectra6 excludes Orange by design; final mapping remains within the 6 fixed colors the panel renders well via dithering.
+
 ## [0.3.0] - 2025-08-04
 
 ### Fixed
@@ -54,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mock-based unit tests for core functionality (`init`, buffer manipulation).
 - Crate documentation and README.
 
+[0.4.0]: https://github.com/xandronak/gdep073e01/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/xandronak/gdep073e01/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/xandronak/gdep073e01/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/xandronak/gdep073e01/compare/v0.1.0...v0.1.1
