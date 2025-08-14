@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PALETTE"],"enum":["Spectra6"],"fn":["add_bias","clamp_u8","map_rgb_to_spectra6_nearest"]};

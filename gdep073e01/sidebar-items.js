@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["HEIGHT","WIDTH"],"enum":["Color","Error"],"mod":["prelude"],"struct":["Gdep073e01"]};
+window.SIDEBAR_ITEMS = {"constant":["HEIGHT","WIDTH"],"enum":["Color","Error"],"mod":["adapter","dither","palette","prelude"],"struct":["Gdep073e01"]};

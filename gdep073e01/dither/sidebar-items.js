@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Bayer4x4"],"trait":["DitherStrategy"]};
